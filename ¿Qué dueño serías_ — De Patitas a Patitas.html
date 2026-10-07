@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>De Patitas a Patitas - ¿Qué dueño serías?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FFF4E0; --cream-dark:#FBE8CB; --card:#FFFDF8;
+  --orange:#E8A050; --orange-dark:#C97A2E; --orange-deep:#A85A1E;
+  --brown:#5A4632; --gray:#9C9284; --dark:#2E3136;
+  --red:#D9684F; --green:#5FA36A; --yellow:#E8C150;
+}
+*{box-sizing:border-box;}
+html,body{margin:0; padding:0;}
+body{
+  font-family:'Nunito',sans-serif; color:var(--brown); min-height:100vh;
+  display:flex; justify-content:center; align-items:flex-start;
+  background:
+    radial-gradient(circle at 15% 10%, #FFE9C2 0%, transparent 40%),
+    radial-gradient(circle at 90% 85%, #FFD9A0 0%, transparent 45%),
+    linear-gradient(160deg, var(--cream) 0%, #FBE3BE 100%);
+  padding:24px 14px calc(24px + env(safe-area-inset-bottom,0px));
+  padding-top:calc(24px + env(safe-area-inset-top,0px));
+  position:relative; overflow-x:hidden;
+}
+body::before{
+  content:"🐾"; position:fixed; font-size:14rem; opacity:0.05; top:-40px; left:-50px;
+  transform:rotate(-20deg); pointer-events:none; z-index:0;
+}
+body::after{
+  content:"🐾"; position:fixed; font-size:14rem; opacity:0.05; bottom:-50px; right:-60px;
+  transform:rotate(15deg); pointer-events:none; z-index:0;
+}
+.float-paw{
+  position:fixed; font-size:1.6rem; opacity:0.18; pointer-events:none; z-index:0;
+  animation:floatUp 9s linear infinite;
+}
+@keyframes floatUp{
+  0%{transform:translateY(10vh) rotate(0deg); opacity:0;}
+  10%{opacity:0.22;}
+  90%{opacity:0.15;}
+  100%{transform:translateY(-110vh) rotate(40deg); opacity:0;}
+}
+
+/* ---- Ambientación: cielo, nubes, pasto, costados ---- */
+.sun{position:fixed; top:16px; left:16px; font-size:2.6rem; z-index:0; opacity:0.9; filter:drop-shadow(0 2px 5px rgba(168,90,30,0.2));}
+.cloud{position:fixed; top:40px; font-size:2.1rem; opacity:0.55; z-index:0; animation:drift linear infinite;}
+@keyframes drift{ from{transform:translateX(-15vw);} to{transform:translateX(115vw);} }
+.grass{
+  position:fixed; bottom:0; left:0; right:0; height:22px; z-index:0; pointer-events:none;
+  background-color:#5B8F4F;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='20'><path d='M0 20 L4 4 L8 20 L12 2 L16 20 L20 6 L24 20 L28 3 L32 20 L36 5 L40 20 Z' fill='%236FAE63'/></svg>");
+  background-repeat:repeat-x; background-position:bottom;
+}
+.side-col{
+  position:fixed; top:0; bottom:22px; width:64px; z-index:0; pointer-events:none;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-around;
+  font-size:1.6rem; opacity:0.22;
+}
+.side-col.left{left:0;} .side-col.right{right:0;}
+.side-col span{animation:sway 3.4s ease-in-out infinite;}
+.side-col span:nth-child(2n){animation-delay:1.1s;}
+.side-col span:nth-child(3n){animation-delay:2s;}
+@keyframes sway{ 0%,100%{transform:rotate(-6deg);} 50%{transform:rotate(6deg);} }
+@media (max-width:820px){ .side-col{display:none;} }
+#wrap{max-width:560px; width:100%; margin:0 auto; position:relative; z-index:1;}
+#muteBtn{
+  position:fixed; top:calc(14px + env(safe-area-inset-top,0px)); right:14px; z-index:50;
+  width:46px; height:46px; border-radius:50%; border:3px solid #fff; background:var(--orange-deep);
+  color:#fff; font-size:1.15rem; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.25);
+  transition:transform .12s;
+}
+#muteBtn:active{transform:scale(0.88);}
+
+/* ---- HUD / "pantalla de mascota" tipo Tamagotchi ---- */
+.pet-screen{
+  background:radial-gradient(circle at 50% 35%, #FFFDF5 0%, #FBE8CB 70%, #F3D9A8 100%);
+  border:5px solid var(--orange-deep); border-radius:28px; padding:14px 10px 10px;
+  margin-bottom:14px; box-shadow:inset 0 2px 10px rgba(168,90,30,0.2), 0 3px 0 var(--orange);
+  text-align:center; position:relative;
+}
+.pet-screen .mood-line{font-size:0.78rem; color:var(--orange-deep); font-weight:700; font-family:'Fredoka',sans-serif; min-height:1.1em; margin-top:4px;}
+.avatar{
+  font-size:3.4rem; width:92px; height:92px; margin:0 auto;
+  background:radial-gradient(circle, #fff 55%, var(--cream-dark) 100%);
+  border:3px solid var(--orange); border-radius:50%;
+  display:flex; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(168,90,30,0.25);
+}
+.avatar.mood-happy{animation:bounceHappy 1.1s ease-in-out infinite;}
+.avatar.mood-ok{animation:bob 2.4s ease-in-out infinite;}
+.avatar.mood-sad{animation:droopSad 2.6s ease-in-out infinite;}
+.avatar.mood-scared{animation:shakeScared 0.5s ease-in-out infinite;}
+@keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
+@keyframes bounceHappy{ 0%,100%{transform:translateY(0) rotate(-4deg);} 25%{transform:translateY(-10px) rotate(4deg);} 50%{transform:translateY(0) rotate(-4deg);} 75%{transform:translateY(-6px) rotate(3deg);} }
+@keyframes droopSad{ 0%,100%{transform:translateY(0) rotate(0deg) scale(1);} 50%{transform:translateY(4px) rotate(0deg) scale(0.97);} }
+@keyframes shakeScared{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-3px) rotate(-3deg);} 75%{transform:translateX(3px) rotate(3deg);} }
+.chapter-label{
+  font-family:'Fredoka',sans-serif; font-weight:700; font-size:0.78rem; color:#fff;
+  background:linear-gradient(135deg,var(--orange-dark),var(--orange-deep)); display:inline-block;
+  padding:4px 14px; border-radius:20px; margin-bottom:4px;
+}
+.delta-row{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin:10px 0 2px;}
+.delta-chip{
+  font-size:0.76rem; font-weight:700; padding:4px 10px; border-radius:14px; font-family:'Fredoka',sans-serif;
+}
+.delta-up{background:#E4F2E3; color:var(--green);}
+.delta-down{background:#FBE2DB; color:var(--red);}
+.delta-same{display:none;}
+.card{
+  background:var(--card); border-radius:22px; padding:26px 22px;
+  box-shadow:0 10px 30px rgba(168,90,30,0.18), 0 2px 0 var(--orange) inset;
+  position:relative; overflow:hidden; animation:fadeIn .4s ease;
+  border:3px solid #fff; width:100%;
+}
+.card::after{
+  content:"🐾"; position:absolute; top:-16px; right:-8px; font-size:4.4rem;
+  opacity:0.06; transform:rotate(18deg); pointer-events:none;
+}
+@keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+.home{text-align:center;}
+.home .paw-big{font-size:3.2rem; margin-bottom:2px;}
+.home h1{font-family:'Fredoka',sans-serif; font-size:1.5rem; color:var(--orange-deep); margin:4px 0 2px;}
+.home .tagline{font-size:0.9rem; color:var(--gray); margin-bottom:16px;}
+.home p.desc{font-size:0.92rem; line-height:1.55; margin-bottom:18px;}
+.stat-preview{display:flex; justify-content:center; gap:8px; margin-bottom:20px; flex-wrap:wrap;}
+.chip{background:var(--cream-dark); border-radius:30px; padding:6px 12px; font-size:0.76rem; font-weight:700; color:var(--orange-deep); white-space:nowrap;}
+.play-btn{
+  font-family:'Fredoka',sans-serif; font-weight:700; font-size:1.05rem;
+  background:linear-gradient(135deg, var(--orange) 0%, var(--orange-deep) 100%); color:#fff; border:none;
+  padding:15px 34px; border-radius:40px; cursor:pointer; box-shadow:0 6px 0 var(--orange-deep), 0 10px 18px rgba(169,90,30,0.3);
+  transition:transform .12s, box-shadow .12s; width:100%; max-width:280px;
+}
+.play-btn:active{transform:translateY(4px); box-shadow:0 2px 0 var(--orange-deep);}
+.footer-note{display:block; margin-top:14px; font-size:0.7rem; color:var(--gray);}
+
+h2.title-game{font-family:'Fredoka',sans-serif; font-size:1.1rem; color:var(--orange-deep); text-align:center; margin:0 0 2px;}
+.subtitle{text-align:center; color:var(--gray); font-size:0.76rem; margin-bottom:10px;}
+.progress-wrap{margin-bottom:16px;}
+.progress-label{font-size:0.72rem; color:var(--gray); text-align:center; margin-bottom:5px;}
+.progress-bg{background:#EBD9B8; border-radius:8px; height:8px; overflow:hidden;}
+.progress-fill{height:100%; border-radius:8px; background:linear-gradient(90deg,var(--orange),var(--orange-deep)); transition:width .4s ease;}
+
+.stats{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:18px;}
+.stat{background:var(--cream-dark); border-radius:12px; padding:8px 10px; text-align:center;}
+.stat-icon{font-size:1rem;}
+.stat-label{font-size:0.66rem; font-weight:700; color:var(--brown); margin:2px 0 5px;}
+.bar-bg{background:#EBD9B8; border-radius:8px; height:8px; overflow:hidden;}
+.bar-fill{height:100%; border-radius:8px; transition:width .6s cubic-bezier(.4,1.4,.6,1);}
+
+.scene-text{font-size:1rem; line-height:1.5; margin-bottom:18px; padding:14px 16px; background:var(--cream-dark); border-radius:14px;}
+.scene-text b{color:var(--orange-deep);}
+
+.choice{
+  display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+  background:#fff; border:2px solid #F0DCB4; border-bottom:4px solid #E4C98A; border-radius:14px; padding:12px 14px;
+  margin-bottom:9px; font-size:0.9rem; font-weight:600; color:var(--brown); cursor:pointer;
+  font-family:'Nunito',sans-serif; transition:transform .1s, border-color .12s, background .12s;
+}
+.choice:hover{border-color:var(--orange); background:#FFF9ED;}
+.choice:active{transform:translateY(2px) scale(0.99); border-bottom-width:2px;}
+.choice .ic{font-size:1.05rem; flex-shrink:0;}
+
+.trivia{
+  background:linear-gradient(135deg, #FFF0DA 0%, #FBE3BE 100%); border:2px dashed var(--orange);
+  padding:15px 16px; border-radius:14px; font-size:0.9rem; margin-bottom:18px; line-height:1.5;
+}
+.trivia .label{font-family:'Fredoka',sans-serif; color:var(--orange-deep); font-weight:700; font-size:0.82rem; display:block; margin-bottom:4px;}
+.feedback-box{
+  background:linear-gradient(135deg, #FFF0DA 0%, #FBE3BE 100%); border-left:5px solid var(--orange-deep);
+  padding:15px 16px; border-radius:14px; font-size:0.95rem; margin-bottom:18px; line-height:1.5;
+}
+.feedback-box .label{font-family:'Fredoka',sans-serif; color:var(--orange-deep); font-weight:700; font-size:0.8rem; display:block; margin-bottom:4px;}
+.gen-btn{
+  display:block; margin:0 auto; font-family:'Fredoka',sans-serif; font-weight:700;
+  background:linear-gradient(135deg, var(--orange) 0%, var(--orange-deep) 100%); color:#fff; border:none;
+  padding:11px 26px; border-radius:24px; font-size:0.88rem; cursor:pointer;
+  box-shadow:0 4px 0 var(--orange-deep);
+}
+.gen-btn:active{transform:translateY(3px); box-shadow:0 1px 0 var(--orange-deep);}
+
+.verdict-badge{font-size:2.8rem; text-align:center; margin-bottom:4px;}
+.verdict-title{font-family:'Fredoka',sans-serif; font-size:1.2rem; color:var(--orange-deep); text-align:center; margin-bottom:12px;}
+.verdict-text{line-height:1.55; margin-bottom:16px; background:var(--cream-dark); padding:15px 16px; border-radius:14px; font-size:0.95rem;}
+.facts{background:var(--dark); color:#F0E8D8; border-radius:14px; padding:16px 18px; font-size:0.84rem; line-height:1.5;}
+.facts .label{font-family:'Fredoka',sans-serif; color:var(--yellow); font-weight:700; display:block; margin-bottom:6px;}
+.restart{
+  display:flex; align-items:center; justify-content:center; gap:8px; width:100%; margin-top:16px;
+  font-family:'Fredoka',sans-serif; font-weight:700; background:linear-gradient(135deg, var(--orange) 0%, var(--orange-deep) 100%);
+  color:#fff; border:none; padding:13px 24px; border-radius:30px; font-size:0.98rem; cursor:pointer;
+  box-shadow:0 5px 0 var(--orange-deep);
+}
+.restart:active{transform:translateY(4px); box-shadow:0 1px 0 var(--orange-deep);}
+
+.confetti{position:fixed; top:-30px; font-size:1.4rem; z-index:60; animation:fall linear forwards; pointer-events:none;}
+@keyframes fall{ to{ transform:translateY(100vh) rotate(360deg); opacity:0.2; } }
+
+footer.sign{text-align:center; font-size:0.68rem; color:var(--gray); margin-top:12px;}
+
+@media (max-width:380px){
+  .card{padding:20px 16px;}
+  .stat-label{font-size:0.6rem;}
+  .choice{font-size:0.84rem; padding:10px 12px;}
+}
+</style>
+</head>
+<body>
+<button id="muteBtn" onclick="toggleMusic()">🔇</button>
+
+<div class="sun">☀️</div>
+<span class="cloud" style="left:-15vw; top:30px; animation-duration:38s;">☁️</span>
+<span class="cloud" style="left:-15vw; top:70px; animation-duration:52s; animation-delay:8s; font-size:1.6rem;">☁️</span>
+<span class="cloud" style="left:-15vw; top:50px; animation-duration:45s; animation-delay:20s;">☁️</span>
+
+<div class="side-col left">
+  <span>🦴</span><span>🐾</span><span>🎾</span><span>🦴</span><span>🐾</span>
+</div>
+<div class="side-col right">
+  <span>🐾</span><span>🎾</span><span>🦴</span><span>🐾</span><span>🎾</span>
+</div>
+<div class="grass"></div>
+
+<span class="float-paw" style="left:8%; animation-delay:0s;">🐾</span>
+<span class="float-paw" style="left:25%; animation-delay:2.5s;">🐾</span>
+<span class="float-paw" style="left:70%; animation-delay:1.2s;">🐾</span>
+<span class="float-paw" style="left:88%; animation-delay:4s;">🐾</span>
+<span class="float-paw" style="left:50%; animation-delay:6s;">🐾</span>
+<div id="wrap"><div id="app"></div></div>
+
+<script>
+/* ---------------- Música ambiental generada (alegre, sin archivos externos) ---------------- */
+let audioCtx, masterGain, musicOn=false, musicTimer;
+function initAudio(){
+  if(audioCtx) return;
+  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0.28;
+  masterGain.connect(audioCtx.destination);
+}
+function playNote(freq, time, dur, type){
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = type || 'triangle';
+  osc.frequency.value = freq;
+  g.gain.setValueAtTime(0, time);
+  g.gain.linearRampToValueAtTime(0.5, time+0.06);
+  g.gain.exponentialRampToValueAtTime(0.001, time+dur);
+  osc.connect(g); g.connect(masterGain);
+  osc.start(time); osc.stop(time+dur+0.05);
+}
+// Escala mayor alegre (C D E F G A B C, ritmo tipo melodía saltarina)
+const scaleUp = [261.6,293.7,329.6,392.0,440.0,523.3,587.3,659.3];
+let noteIdx = 0;
+function scheduleLoop(){
+  if(!musicOn) return;
+  const now = audioCtx.currentTime + 0.05;
+  let t = now;
+  const pattern = [0,2,4,2,5,4,2,0];
+  for(let i=0;i<pattern.length;i++){
+    const freq = scaleUp[pattern[i]];
+    playNote(freq, t, 0.42, 'triangle');
+    if(i%2===0) playNote(freq/2, t, 0.5, 'sine');
+    t += 0.33;
+  }
+  musicTimer = setTimeout(scheduleLoop, pattern.length*330);
+}
+function toggleMusic(force){
+  initAudio();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  clearTimeout(musicTimer); /* evita loops superpuestos al reiniciar */
+  musicOn = (force !== undefined) ? force : !musicOn;
+  document.getElementById('muteBtn').textContent = musicOn ? '🔊' : '🔇';
+  if(musicOn) scheduleLoop(); else clearTimeout(musicTimer);
+}
+function playClick(freq, type){
+  initAudio();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  playNote(freq || 740, audioCtx.currentTime, 0.1, type || 'square');
+}
+function playPositive(){
+  initAudio(); if(audioCtx.state==='suspended') audioCtx.resume();
+  const t = audioCtx.currentTime;
+  playNote(523,t,0.12,'triangle'); playNote(659,t+0.09,0.14,'triangle'); playNote(784,t+0.18,0.2,'triangle');
+}
+function playNegative(){
+  initAudio(); if(audioCtx.state==='suspended') audioCtx.resume();
+  const t = audioCtx.currentTime;
+  playNote(300,t,0.16,'sawtooth'); playNote(220,t+0.12,0.22,'sawtooth');
+}
+
+/* ---------------- Estado del juego ---------------- */
+const state = { confianza:7, animo:7, miedo:2, vida:8, step:-1, feedback:null };
+const MAXS = 10;
+let currentOrder = [];
+let shuffledStep = -2;
+
+function moodInfo(){
+  const avg = (state.confianza + state.animo + state.vida + (10-state.miedo)) / 4;
+  if(state.miedo >= 7) return {face:"😨", cls:"mood-scared", line:"Tu perro tiembla un poco, muy asustado..."};
+  if(avg >= 7.5) return {face:"😄", cls:"mood-happy", line:"¡Tu perro mueve la cola sin parar!"};
+  if(avg >= 5.5) return {face:"🙂", cls:"mood-ok", line:"Tu perro está tranquilo, atento a ti."};
+  if(avg >= 3.5) return {face:"😟", cls:"mood-sad", line:"Tu perro se ve un poco inseguro hoy."};
+  return {face:"😢", cls:"mood-sad", line:"Tu perro está triste, casi no se mueve."};
+}
+function chapterFor(step){
+  if(step <= 4) return "🐾 Capítulo 1 · Cachorro";
+  if(step <= 11) return "🐾 Capítulo 2 · Creciendo";
+  if(step <= 20) return "🐾 Capítulo 3 · Imprevistos";
+  return "🐾 Capítulo 4 · El cierre";
+}
+
+const scenes = [
+{ type:"story", icon:"🎾", text:"Acabas de adoptar un cachorro. Es <b>viernes por la tarde</b> y tenías planes con amigos, pero tu perro no ha salido a pasear en todo el día.",
+  choices:[
+    {label:"Cancelas tus planes y lo sacas a pasear", ic:"🚶", effect:{confianza:2,animo:2,miedo:-1}, feedback:"Tu perro mueve la cola feliz — sintió que lo elegiste a él primero."},
+    {label:"Lo paseas rápido, 10 minutos, y te vas", ic:"🏃", effect:{animo:-1}, feedback:"No es ideal, pero al menos no quedó totalmente solo hoy."},
+    {label:"Sales igual, 'ya pasearé mañana'", ic:"🚪", effect:{animo:-2,miedo:1}, feedback:"Se queda esperando en la puerta toda la noche, sin entender por qué."}
+  ]},
+{ type:"trivia", icon:"💡", text:"Según la ASPCA, la falta de tiempo es una de las causas más comunes de abandono animal — mucho antes de llegar al abandono, empieza como pequeñas ausencias que se acumulan." },
+
+{ type:"story", icon:"🦷", text:"Tu cachorro está <b>mordiendo los muebles y tus zapatillas</b> mientras le salen los dientes.",
+  choices:[
+    {label:"Le das juguetes para morder y refuerzas lo positivo", ic:"🧸", effect:{confianza:2,animo:1,miedo:-1}, feedback:"Aprende rápido que morder juguetes sí está bien — y no te teme."},
+    {label:"Le dices 'no' firme, sin gritar", ic:"🗣️", effect:{confianza:1}, feedback:"Entiende el límite poco a poco, aunque le toma más tiempo."},
+    {label:"Lo golpeas o gritas fuerte cada vez", ic:"✋", effect:{miedo:3,confianza:-2}, feedback:"Deja de morder los muebles... pero ahora también te teme a ti."}
+  ]},
+{ type:"trivia", icon:"🐕", text:"Según la Humane Society, el refuerzo positivo es más efectivo que el castigo para entrenar mascotas — el castigo físico genera miedo y agresividad, no obediencia real." },
+
+{ type:"story", icon:"😨", text:"Tu perro se pone <b>nervioso y ladra</b> cuando llegan visitas a casa.",
+  choices:[
+    {label:"Buscas info y lo ayudas con paciencia", ic:"🤲", effect:{confianza:2,miedo:-2}, feedback:"Poco a poco aprende que las visitas no son una amenaza."},
+    {label:"Lo encierras en otro cuarto cuando hay visitas", ic:"🚪", effect:{miedo:1,animo:-1}, feedback:"Evita el conflicto, pero nunca aprende a sentirse seguro con gente nueva."},
+    {label:"Lo regañas fuerte para que 'aprenda'", ic:"😠", effect:{miedo:3,confianza:-2,vida:-1}, feedback:"Ahora le teme tanto a las visitas como a ti."}
+  ]},
+
+{ type:"story", icon:"📦", text:"Te mudas a un <b>departamento más pequeño</b>. Hay menos espacio y menos tiempo libre en tu nueva rutina.",
+  choices:[
+    {label:"Buscas un parque cercano y ajustas horarios", ic:"🌳", effect:{animo:1,vida:1}, feedback:"El espacio es más chico, pero su rutina sigue siendo buena."},
+    {label:"Mantienes los paseos, pero más cortos", ic:"🚶‍♂️", effect:{animo:0}, feedback:"No es lo ideal, pero tampoco lo abandonas por completo."},
+    {label:"Empiezas a dejarlo solo más horas", ic:"🔒", effect:{animo:-2,vida:-2,miedo:1}, feedback:"Pasa más tiempo encerrado y solo de lo que debería."}
+  ]},
+{ type:"trivia", icon:"🇵🇪", text:"En el Perú se estima que alrededor de 3 millones de perros viven en situación de abandono en las calles del país." },
+
+{ type:"story", icon:"🏖️", text:"Tu familia planea un <b>viaje de una semana</b> a la playa. El hotel no acepta mascotas.",
+  choices:[
+    {label:"Buscas hospedaje pet-friendly o alguien de confianza", ic:"🧳", effect:{confianza:1,animo:1}, feedback:"Viaja contigo o queda en buenas manos — no se siente abandonado."},
+    {label:"Lo dejas con un vecino que apenas conoce", ic:"🏠", effect:{miedo:1,animo:-1}, feedback:"Está bien cuidado, pero extraña su rutina y a ti."},
+    {label:"Lo dejas solo en casa toda la semana", ic:"🏚️", effect:{miedo:3,vida:-3,animo:-2}, feedback:"Pasa días enteros sin ver a nadie. El miedo se instala."}
+  ]},
+
+{ type:"story", icon:"📢", text:"Un vecino se queja porque tu perro <b>ladra mucho</b> cuando te vas a trabajar.",
+  choices:[
+    {label:"Investigas la causa: puede ser ansiedad por separación", ic:"🔍", effect:{confianza:1,miedo:-2}, feedback:"Descubres que ladra porque le aterra quedarse solo — y lo ayudas."},
+    {label:"Le pones un collar antiladridos", ic:"📿", effect:{miedo:2,confianza:-1}, feedback:"Deja de ladrar, pero por miedo al castigo, no porque esté tranquilo."},
+    {label:"Lo dejas afuera todo el día", ic:"🌧️", effect:{miedo:2,vida:-2,animo:-2}, feedback:"Ya no molesta al vecino... porque está solo, afuera, todo el día."}
+  ]},
+{ type:"trivia", icon:"🔊", text:"Según la RSPCA, el ladrido excesivo suele ser señal de aburrimiento o ansiedad por separación — no de 'mal comportamiento'." },
+
+{ type:"story", icon:"✈️", text:"Te ofrecen un <b>trabajo en otra ciudad</b>. Mudarte con tu perro implica más gastos y trámites.",
+  choices:[
+    {label:"Te lo llevas contigo, pase lo que pase", ic:"❤️", effect:{confianza:3,animo:2,vida:1}, feedback:"El cambio es grande, pero sigues ahí. Eso es lo que más le importa."},
+    {label:"Buscas una familia de confianza que lo adopte", ic:"🤝", effect:{confianza:-1,animo:-1,miedo:1}, feedback:"No es fácil, pero al menos no queda en la calle."},
+    {label:"Decides que es 'mejor' dejarlo con alguien... o en la calle", ic:"💔", effect:{confianza:-4,animo:-3,miedo:3,vida:-3}, feedback:"De un día para otro, pierde todo lo que conocía."}
+  ]},
+{ type:"trivia", icon:"📊", text:"En 2023 se registraron 1,686 denuncias por maltrato y abandono animal en el Perú — y más de la mitad fueron archivadas antes de llegar a juicio." },
+
+{ type:"story", icon:"👶", text:"Llega un <b>nuevo bebé</b> a la familia y de repente hay mucho menos tiempo para todo.",
+  choices:[
+    {label:"Ajustas rutinas para mantenerle tiempo", ic:"🧡", effect:{confianza:1,animo:1}, feedback:"Hay cambios, pero sigue sintiéndose parte de la familia."},
+    {label:"Le das menos tiempo, pero sigue en casa", ic:"🏡", effect:{animo:-1}, feedback:"Nota la diferencia, aunque sigue teniendo un lugar en casa."},
+    {label:"Lo relegas casi por completo", ic:"😔", effect:{animo:-3,confianza:-2,miedo:1}, feedback:"Empieza a sentir que ya no es importante para nadie."}
+  ]},
+
+{ type:"story", icon:"🩹", text:"Tu perro se <b>enferma gravemente</b> y el tratamiento veterinario es costoso.",
+  choices:[
+    {label:"Buscas planes de pago y lo tratas", ic:"🏥", effect:{vida:3,confianza:2,animo:1}, feedback:"El esfuerzo vale la pena — se recupera gracias a ti."},
+    {label:"Buscas una clínica más económica, aunque tardes en decidir", ic:"⏱️", effect:{vida:1}, feedback:"Se recupera, aunque el proceso fue más lento de lo ideal."},
+    {label:"Decides no tratarlo porque 'es mucho gasto'", ic:"💸", effect:{vida:-4,animo:-2}, feedback:"Su salud empeora por una decisión que se pudo evitar."}
+  ]},
+{ type:"trivia", icon:"🏥", text:"Según la AVMA, muchas renuncias de mascotas por 'costo veterinario' podrían evitarse: existen clínicas de bajo costo y planes de pago en muchas ciudades." },
+
+{ type:"story", icon:"🌧️", text:"Cae una <b>tormenta muy fuerte</b> una noche y hace mucho frío afuera.",
+  choices:[
+    {label:"Le preparas un refugio seco y cálido", ic:"🏠", effect:{vida:1,confianza:1}, feedback:"Pasa la tormenta protegido, sin pasar frío."},
+    {label:"Lo dejas con un techo improvisado", ic:"🌦️", effect:{vida:0}, feedback:"No se moja del todo, pero tampoco está realmente cómodo."},
+    {label:"No haces nada, 'ya se las arreglará'", ic:"🥶", effect:{vida:-2,confianza:-1,miedo:1}, feedback:"Pasa la noche temblando de frío, sin refugio real."}
+  ]},
+
+{ type:"story", icon:"🏃‍♂️", text:"Un día se queda la <b>puerta abierta</b> y tu perro se escapa.",
+  choices:[
+    {label:"Buscas activamente, pones carteles, avisas a vecinos", ic:"📋", effect:{confianza:2,animo:1}, feedback:"Lo encuentras a tiempo — el alivio es enorme para ambos."},
+    {label:"Esperas un poco antes de salir a buscarlo", ic:"🕐", effect:{miedo:1}, feedback:"Al final lo encuentras, pero pasó más miedo del necesario."},
+    {label:"No haces nada, asumes que no vuelve", ic:"🚫", effect:{confianza:-3,animo:-2,miedo:2}, feedback:"Nadie sale a buscarlo. Queda perdido, solo, en la calle."}
+  ]},
+{ type:"trivia", icon:"🏷️", text:"Según World Animal Protection, el microchip y una placa de identificación aumentan muchísimo las probabilidades de que una mascota perdida regrese a casa." },
+
+{ type:"story", icon:"🍽️", text:"Notas que tu perro <b>dejó de comer bien</b> hace unos días.",
+  choices:[
+    {label:"Lo llevas al veterinario de inmediato", ic:"🩺", effect:{vida:2,confianza:1}, feedback:"Detectan el problema a tiempo, antes de que empeore."},
+    {label:"Esperas unos días observando", ic:"👀", effect:{vida:-1}, feedback:"El problema sigue ahí mientras tú solo observas."},
+    {label:"Lo ignoras, 'ya se le pasará'", ic:"🙈", effect:{vida:-3,animo:-1}, feedback:"Lo que pudo ser leve se vuelve un problema serio."}
+  ]},
+
+{ type:"story", icon:"💰", text:"Llega un <b>problema económico fuerte</b> en la familia y hay que recortar gastos.",
+  choices:[
+    {label:"Ajustas otros gastos para mantener su alimentación", ic:"🥘", effect:{vida:2,confianza:1}, feedback:"Encuentra su plato lleno, aunque tú tuviste que ajustar otras cosas."},
+    {label:"Buscas alimento más económico pero balanceado", ic:"🛒", effect:{vida:0}, feedback:"No es lo mismo de siempre, pero sigue bien alimentado."},
+    {label:"Reduces drásticamente su comida", ic:"📉", effect:{vida:-3,animo:-2}, feedback:"Empieza a pasar hambre, sin entender por qué."}
+  ]},
+{ type:"trivia", icon:"🤝", text:"Según la FAO e IFAW, muchas comunidades ya cuentan con bancos de alimento para mascotas y campañas gratuitas de esterilización y vacunación — pedir ayuda no es un fracaso." },
+
+{ type:"story", icon:"🌎", text:"Debes <b>mudarte a otro país</b> y llevarlo es muy caro y complicado en trámites.",
+  choices:[
+    {label:"Resuelves trámites y costos para llevarlo contigo", ic:"🛫", effect:{confianza:3,animo:2,vida:1}, feedback:"Cruzan el mundo juntos. Sigue teniendo un hogar: el tuyo."},
+    {label:"Buscas activamente una familia responsable con seguimiento", ic:"📝", effect:{confianza:-1,animo:-1}, feedback:"Es un adiós difícil, pero al menos no queda desprotegido."},
+    {label:"Lo abandonas porque 'es muy complicado'", ic:"😞", effect:{confianza:-4,animo:-3,miedo:3,vida:-3}, feedback:"De un momento a otro, pierde todo lo que conocía: su hogar, su gente, su rutina."}
+  ]},
+
+{ type:"story", icon:"🦴", text:"Han pasado los años. Tu perro ya es mayor y necesita <b>más cuidados veterinarios</b> de lo normal.",
+  choices:[
+    {label:"Asumes el gasto, es parte del compromiso", ic:"💪", effect:{confianza:2,animo:1,vida:2}, feedback:"En sus años finales, sigue sintiéndose cuidado y querido."},
+    {label:"Vas al veterinario solo en emergencias", ic:"🚑", effect:{vida:0}, feedback:"Sobrelleva su vejez, aunque sin el seguimiento que merecería."},
+    {label:"Postergas las visitas indefinidamente", ic:"⏳", effect:{vida:-3,animo:-1}, feedback:"Su vejez se vuelve más difícil de lo que debería ser."}
+  ]}
+];
+
+function clamp(v){ return Math.max(0, Math.min(MAXS, v)); }
+function applyEffect(effect){ for(const k in effect){ state[k] = clamp(state[k] + effect[k]); } }
+
+function statColor(key){
+  if(key==="miedo") return state.miedo>=7?"var(--red)":state.miedo>=4?"var(--orange-deep)":"var(--green)";
+  const v = state[key];
+  return v>=7?"var(--green)":v>=4?"var(--orange-deep)":"var(--red)";
+}
+
+function renderStats(){
+  const labels = {confianza:["Confianza","🤝"], animo:["Ánimo","😊"], miedo:["Miedo","😨"], vida:["Vida","❤️"]};
+  const m = moodInfo();
+  let html = `<div class="pet-screen"><div class="avatar ${m.cls}">${m.face}</div><div class="mood-line">${m.line}</div></div><div class="stats">`;
+  for(const k in labels){
+    html += `<div class="stat"><div class="stat-icon">${labels[k][1]}</div><div class="stat-label">${labels[k][0]}</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${state[k]*10}%; background:${statColor(k)}"></div></div></div>`;
+  }
+  html += '</div>';
+  return html;
+}
+function renderDeltas(deltas){
+  if(!deltas) return "";
+  const labels = {confianza:["Confianza","🤝"], animo:["Ánimo","😊"], miedo:["Miedo","😨"], vida:["Vida","❤️"]};
+  let html = '<div class="delta-row">';
+  for(const k in deltas){
+    const d = deltas[k];
+    if(d === 0) continue;
+    const bad = (k === "miedo") ? (d > 0) : (d < 0);
+    const cls = bad ? "delta-down" : "delta-up";
+    const sign = d > 0 ? "+" + d : d;
+    html += `<span class="delta-chip ${cls}">${labels[k][1]} ${sign}</span>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderProgress(){
+  const total = scenes.length;
+  const pct = Math.round((state.step/total)*100);
+  return `<div class="progress-wrap">
+    <div class="progress-label">Paso ${state.step+1} de ${total}</div>
+    <div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div>
+  </div>`;
+}
+
+function render(){
+  const app = document.getElementById("app");
+  if(state.step === -1){ renderHome(app); return; }
+  if(state.feedback){ renderFeedback(app); return; }
+  if(state.step >= scenes.length){ renderEnding(app); return; }
+
+  const scene = scenes[state.step];
+  let html = `<div class="card">
+    <div style="text-align:center;"><span class="chapter-label">${chapterFor(state.step)}</span></div>
+    ${renderProgress()}
+    ${renderStats()}`;
+
+  if(scene.type === "trivia"){
+    html += `<div class="trivia"><span class="label">${scene.icon} Dato real</span>${scene.text}</div>
+      <button class="gen-btn" onclick="next()">Continuar →</button>`;
+  } else {
+    if(shuffledStep !== state.step){
+      currentOrder = scene.choices.map((_,i)=>i);
+      for(let i=currentOrder.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [currentOrder[i],currentOrder[j]] = [currentOrder[j],currentOrder[i]];
+      }
+      shuffledStep = state.step;
+    }
+    html += `<div class="scene-text">${scene.icon} ${scene.text}</div>`;
+    currentOrder.forEach((idx) => {
+      const c = scene.choices[idx];
+      html += `<button class="choice" onclick="choose(${idx})"><span class="ic">${c.ic}</span> ${c.label}</button>`;
+    });
+  }
+  html += `</div>
+    <footer class="sign">Proyecto de Investigación Personal — "De Patitas a Patitas" — Nicolás Saldarriaga</footer>`;
+  app.innerHTML = html;
+}
+
+function renderFeedback(app){
+  const scene = scenes[state.step];
+  app.innerHTML = `<div class="card">
+    <div style="text-align:center;"><span class="chapter-label">${chapterFor(state.step)}</span></div>
+    ${renderProgress()}
+    ${renderStats()}
+    ${renderDeltas(state.feedback.deltas)}
+    <div class="feedback-box"><span class="label">${scene.icon} Lo que pasó</span>${state.feedback.text}</div>
+    <button class="gen-btn" onclick="continueAfterFeedback()">Continuar →</button>
+  </div>
+  <footer class="sign">Proyecto de Investigación Personal — "De Patitas a Patitas" — Nicolás Saldarriaga</footer>`;
+}
+
+function renderHome(app){
+  app.innerHTML = `<div class="card home">
+    <div class="pet-screen"><div class="avatar mood-happy">🐶</div><div class="mood-line">Te está esperando...</div></div>
+    <h1>¿Qué dueño serías?</h1>
+    <div class="tagline">Una historia interactiva — De Patitas a Patitas</div>
+    <p class="desc">Cada decisión que tomes cambiará el destino de tu perro. Cuídalo desde el primer día de adopción hasta su vejez, y descubre si tus elecciones lo habrían cuidado... o abandonado.</p>
+    <div class="stat-preview">
+      <span class="chip">🤝 Confianza</span><span class="chip">😊 Ánimo</span>
+      <span class="chip">😨 Miedo</span><span class="chip">❤️ Vida</span>
+    </div>
+    <button class="play-btn" onclick="startGame()">🐾 Comenzar historia</button>
+    <span class="footer-note">15 decisiones · 3 alternativas c/u · basado en casos reales</span>
+  </div>`;
+}
+
+function startGame(){ musicOn=false; toggleMusic(true); playClick(880); state.step = 0; render(); }
+function choose(i){
+  const scene = scenes[state.step];
+  const c = scene.choices[i];
+  const before = {confianza:state.confianza, animo:state.animo, miedo:state.miedo, vida:state.vida};
+  applyEffect(c.effect);
+  const deltas = {};
+  for(const k in before){ deltas[k] = state[k] - before[k]; }
+  const score = (deltas.confianza||0) + (deltas.animo||0) + (deltas.vida||0) - (deltas.miedo||0);
+  if(score > 0) playPositive(); else if(score < 0) playNegative(); else playClick(660);
+  state.feedback = { text: c.feedback, deltas: deltas };
+  render();
+}
+function continueAfterFeedback(){ playClick(880); state.feedback = null; state.step++; render(); }
+function next(){ playClick(880); state.step++; render(); }
+
+function renderEnding(app){
+  const avg = (state.confianza + state.animo + state.vida + (10-state.miedo)) / 4;
+  let badge, title, text;
+  if(avg >= 7.5){
+    badge = "🏆"; title = "Le diste una vida plena";
+    text = "Tu perro creció confiado, feliz y sano. Cada decisión pequeña — pasearlo, atenderlo, no postergar lo importante — fue lo que marcó la diferencia. Esto es justo lo que significa la adopción responsable: no un acto único, sino cientos de decisiones diarias.";
+    spawnConfetti();
+  } else if(avg >= 5){
+    badge = "⚖️"; title = "Tuvo una vida con altibajos";
+    text = "Hubo momentos de verdadero cuidado, pero también ausencias que dejaron huella. Así empiezan muchos de los casos reales de negligencia: no con mala intención, sino con decisiones que parecían pequeñas en el momento.";
+  } else {
+    badge = "💔"; title = "Esta es la historia que queremos evitar";
+    text = "Las decisiones que tomaste reflejan el patrón que lleva al abandono y al maltrato: no suele empezar con crueldad, sino con ausencias que se acumulan hasta que ya es demasiado tarde. Esta es exactamente la historia que cuenta el diario completo.";
+  }
+
+  app.innerHTML = `<div class="card">
+    <div class="verdict-badge">${badge}</div>
+    <div class="verdict-title">${title}</div>
+    ${renderStats()}
+    <div class="verdict-text">${text}</div>
+    <div class="facts">
+      <span class="label">🐾 La realidad detrás de este juego</span>
+      En el Perú, cerca de 3 millones de perros viven en abandono. En 2023 hubo 1,686 denuncias por maltrato animal, y más del 58% fueron archivadas. La Ley N.° 30407 protege a los animales, pero solo funciona si alguien denuncia.
+      <br><br>Si ves un caso real, repórtalo a tu comisaría, SERFOR o municipalidad.
+    </div>
+    <button class="restart" onclick="restart()">🔄 Volver a jugar</button>
+  </div>
+  <footer class="sign">Proyecto de Investigación Personal — "De Patitas a Patitas" — Nicolás Saldarriaga</footer>`;
+}
+
+function restart(){ playClick(500); state.confianza=7; state.animo=7; state.miedo=2; state.vida=8; state.step=-1; state.feedback=null; shuffledStep=-2; render(); }
+
+function spawnConfetti(){
+  const emojis = ["🐾","🎉","✨","🦴"];
+  for(let i=0;i<22;i++){
+    const el = document.createElement("span");
+    el.className = "confetti";
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.left = Math.random()*100 + "vw";
+    el.style.animationDuration = (2.5 + Math.random()*2) + "s";
+    el.style.fontSize = (1 + Math.random()*1.2) + "rem";
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 5000);
+  }
+}
+
+render();
+</script>
+</body>
+</html>
